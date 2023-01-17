@@ -1,0 +1,211 @@
+/* dark */
+
+.dark {
+    background: #222222;
+    color: #EEEEEE;
+}
+
+.dark * {
+    scrollbar-color: #555555 #333333;
+}
+
+.dark *::-webkit-scrollbar-thumb {
+    background: #555555;
+}
+
+.dark header {
+    background: #333333;
+    color: #EEEEEE;
+}
+
+.dark .now {
+    color: #999999;
+}
+
+.dark main {
+    background: #333333;
+}
+
+.dark .link {
+    color: #999999;
+}
+
+.dark #musicBtn, .dark #lightBtn, .dark .menu, .dark #linkMenu {
+    background: #333333;
+    color: #EEEEEE;
+}
+
+.dark .hide {
+    color: #333333;
+}
+
+@media (any-hover: hover) {
+    .dark nav:hover, .dark .menu .btn:hover {
+        background: rgba(238, 238, 238, 0.2);
+    }
+}
+
+@media (any-hover: none) {
+    .dark nav:active, .dark .menu .btn:active {
+        background: rgba(238, 238, 238, 0.2);
+    }
+}
+
+/* white */
+
+.white {
+    background: #CCCCCC;
+    color: #222222;
+}
+
+.white * {
+    scrollbar-color: #BBBBBB #DDDDDD;
+}
+
+.white *::-webkit-scrollbar-thumb {
+    background: #BBBBBB;
+}
+
+.white header {
+    background: #DDDDDD;
+    color: #222222;
+}
+
+.white .now {
+    color: #999999;
+}
+
+.white main {
+    background: #DDDDDD;
+}
+
+.white .link {
+    color: #999999;
+}
+
+.white #musicBtn, .white #lightBtn, .white .menu, .white #linkMenu {
+    background: #DDDDDD;
+    color: #222222;
+}
+
+.white .hide {
+    color: #DDDDDD;
+}
+
+@media (any-hover: hover) {
+    .white nav:hover, .white .menu .btn:hover {
+        background: rgba(238, 238, 238, 0.8);
+    }
+}
+
+@media (any-hover: none) {
+    .white nav:active, .white .menu .btn:active {
+        background: rgba(238, 238, 238, 0.8);
+    }
+}
+
+/* blue */
+
+.blue {
+    background: #EEEEEE;
+    color: #111111;
+}
+
+.blue * {
+    scrollbar-color: #99CCFF #FFFFFF;
+}
+
+.blue *::-webkit-scrollbar-thumb {
+    background: #99CCFF;
+}
+
+.blue header {
+    background: #99CCFF;
+    color: #EEEEEE;
+}
+
+.blue .now {
+    color: #FFFFFF;
+}
+
+.blue main {
+    background: #FFFFFF;
+}
+
+.blue .link {
+    color: #999999;
+}
+
+.blue #musicBtn, .blue #lightBtn, .blue .menu, .blue #linkMenu {
+    background: #99CCFF;
+    color: #EEEEEE;
+}
+
+.blue .hide {
+    color: #99CCFF;
+}
+
+@media (any-hover: hover) {
+    .blue nav:hover, .blue .menu .btn:hover {
+        background: rgba(238, 238, 238, 0.2);
+    }
+}
+
+@media (any-hover: none) {
+    .blue nav:active, .blue .menu .btn:active {
+        background: rgba(238, 238, 238, 0.2);
+    }
+}
+
+/* pink */
+
+.pink {
+    background: #EEEEEE;
+    color: #111111;
+}
+
+.pink * {
+    scrollbar-color: #FF99CC #FFFFFF;
+}
+
+.pink *::-webkit-scrollbar-thumb {
+    background: #FF99CC;
+}
+
+.pink header {
+    background: #FF99CC;
+    color: #EEEEEE;
+}
+
+.pink .now {
+    color: #FFFFFF;
+}
+
+.pink main {
+    background: #FFFFFF;
+}
+
+.pink .link {
+    color: #999999;
+}
+
+.pink #musicBtn, .pink #lightBtn, .pink .menu, .pink #linkMenu {
+    background: #FF99CC;
+    color: #EEEEEE;
+}
+
+.pink .hide {
+    color: #FF99CC;
+}
+
+@media (any-hover: hover) {
+    .pink nav:hover, .pink .menu .btn:hover {
+        background: rgba(238, 238, 238, 0.2);
+    }
+}
+
+@media (any-hover: none) {
+    .pink nav:active, .pink .menu .btn:active {
+        background: rgba(238, 238, 238, 0.2);
+    }
+}

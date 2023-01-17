@@ -1,0 +1,379 @@
+html, 
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: all 1s;
+}
+
+body {
+    display: none;
+}
+
+* {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+}
+
+*::-webkit-scrollbar {
+    width: 0.5vw;
+    background: none;
+}
+
+*::-webkit-scrollbar-thumb {
+    border-radius: 0.25vw;
+}
+
+@font-face{
+    font-family: 'btnFont';
+    src : url('../font/btnFont.woff2');
+}
+
+header {
+    position: fixed;
+    display: flex;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 1s;
+}
+
+nav {
+    display: flex;
+    width: 10vh;
+    height: 100%;
+    font-size: 2vh;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    cursor: pointer;
+    opacity: 0;
+    transition: font-size 1s, opacity 1s;
+}
+
+.show nav {
+    opacity: 1;
+}
+
+main {
+    position: fixed;
+    display: flex;
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    height: 80%;
+    align-items: center;
+    justify-content: center;
+    transition: all 1s;
+}
+
+#loading {
+    transition: opacity 1s;
+}
+
+#taiChiDiagram {
+    display: block;
+    margin: auto;
+    border-radius: 50%;
+    box-shadow: 0px 0px 10px #000000;
+    cursor: pointer;
+}
+
+#taiChiDiagram::after{
+    background:#FFFFFF;
+    border-color: #000000;
+}
+
+#loading .text {
+    width: fit-content;
+    transition: all 1s;
+}
+
+#container {
+    display: none;
+    width: 90%;
+    height: 90%;
+    overflow: auto;
+}
+
+#homeText {
+    text-align: center;
+    transition: all 2s;
+}
+
+#container div {
+    width: 100%;
+}
+
+#container > div:last-child .friendlyLink {
+    margin-bottom: 0;
+}
+
+.friendlyLink img {
+    transform: rotate(0deg);
+}
+
+.friendlyLink:hover img {
+    transform: rotate(360deg);
+}
+
+.friendlyLink img {
+    transform: rotate(0deg);
+}
+
+.friendlyLink:hover img {
+    transform: rotate(360deg);
+}
+
+#musicBtn, #lightBtn {
+    position: fixed;
+    z-index: 2;
+    bottom: 1vh;
+    width: 5vh;
+    height: 5vh;
+    font-size: 2.5vh;
+    line-height: 5vh;
+    text-align: center;
+    border-radius: 50%;
+    font-family: 'btnFont';
+    transition: all 1s;
+}
+
+#musicBtn {
+    opacity: 0;
+    left: 1vh;
+}
+
+#lightBtn {
+    right: 1vh;
+    cursor: pointer;
+}
+
+.colorStyle {
+    display: inline-block;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 5px #000000, 0 0 5px #FFFFFF;
+}
+
+#container div .colorStyle:first-child {
+    margin-left: 0;
+}
+
+.menu {
+    position: fixed;
+    z-index: 1;
+    bottom: 1vh;
+    width: 5vh;
+    height: 5vh;
+    border-radius: 2.5vh;
+    overflow: hidden;
+    transition: all 1s;
+}
+
+.menu:not(.menu ~ .menu) {
+    display: none;
+    left: 1vh;
+    text-align: right;
+}
+
+.menu:is(.menu ~ .menu) {
+    right: 1vh;
+}
+
+.menu .btn {
+    width: 9.5vh;
+    font-size: 1.8vh;
+    line-height: 5vh;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: font-size 1s;
+}
+
+.menu:not(.menu ~ .menu) .btn {
+    padding-left: 5vh;
+    padding-right: 2.5vh;
+}
+
+.menu:is(.menu ~ .menu) .btn {
+    padding-left: 2.5vh;
+    padding-right: 5vh;
+}
+
+#linkMenu {
+    position: fixed;
+    z-index: 1;
+    width: 0;
+    height: 0;
+    border-radius: 2.5vh;
+    overflow: hidden;
+    transition: all 1s;
+}
+
+#linkMenu .btn {
+    padding: 0 2vh;
+    width: 10vh;
+    font-size: 1.8vh;
+    line-height: 5vh;
+    text-align: center;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: font-size 1s;
+}
+
+#mask {
+    position: fixed;
+    display: none;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+}
+
+@media screen and (min-aspect-ratio: 1 / 1) {
+    main {
+        border-radius: 1vh;
+    }
+
+    #taiChiDiagram {
+        width: 20vh;
+        height: 20vh;
+    }
+
+    #loading .text {
+        margin: 3vh auto 0 auto;
+        height: 6vh;
+        font-size: 3vh;
+    }
+
+    #homeText {
+        font-size: 2.5vw;
+    }
+
+    #container div {
+        font-size: 1.25vw;
+        line-height: 2.5vw;
+    }
+
+    .friendlyLink {
+        margin-bottom: 0.5vw;
+        width: 2.75vw;
+        height: 2.75vw;
+    }
+    
+    .friendlyLink img {
+        width: 2.75vw;
+        height: 2.75vw;
+    }
+
+    .friendlyLink div {
+        margin-left: 0.5vw;
+    }
+
+    #container .friendlyLink:hover div {
+        font-size: 1.375vw;
+        line-height: 2.75vw;
+    }
+
+    #container .font-size {
+        font-size: calc(var(--font-size) * 1vw);
+        line-height: calc(var(--font-size) * 2vw);
+    }
+
+    #container div .colorStyle {
+        margin-left: 1vw;
+        width: 2.75vw;
+        height: 2.75vw;
+    }
+}
+
+@media screen and (max-aspect-ratio: 1 / 1) {
+    main {
+        border-radius: 1vw;
+    }
+    
+    #taiChiDiagram {
+        width: 20vw;
+        height: 20vw;
+    }
+
+    #loading .text {
+        margin: 3vw auto 0 auto;
+        height: 6vw;
+        font-size: 3vw;
+    }
+
+    #homeText {
+        font-size: 2.5vh;
+    }
+
+    #container div {
+        font-size: 1.25vh;
+        line-height: 2.5vh;
+    }
+
+    .friendlyLink {
+        margin-bottom: 0.5vh;
+        width: 2.75vh;
+        height: 2.75vh;
+    }
+
+    .friendlyLink img {
+        width: 2.75vh;
+        height: 2.75vh;
+    }
+
+    .friendlyLink div {
+        margin-left: 0.5vh;
+    }
+
+    #container .friendlyLink:hover div {
+        font-size: 1.375vh;
+        line-height: 2.75vh;
+    }
+
+    #container .font-size {
+        font-size: calc(var(--font-size) * 1vh);
+        line-height: calc(var(--font-size) * 2vh);
+    }
+
+    #container div .colorStyle {
+        margin-left: 1vh;
+        width: 2.75vh;
+        height: 2.75vh;
+    }
+}
+
+
+
+@keyframes taiChiDiagramRotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes opacityChange {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}

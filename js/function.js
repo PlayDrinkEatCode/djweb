@@ -252,6 +252,9 @@ const bindMenu = (element, functions) => {
         e.preventDefault();
         show(e);
     });
+    element.addEventListener('mousedown', (e) => {
+        state.valid = true;
+    });
     element.addEventListener('touchstart', (e) => {
         state.valid = true;
         state.x = e.touches[0].clientX;

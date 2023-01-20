@@ -1,13 +1,38 @@
-html, 
-body {
-    margin: 0;
-    padding: 0;
+@font-face{
+    font-family: 'btnFont';
+    src : url('../font/btnFont.woff2');
+}
+
+@keyframes taiChiDiagramRotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes opacityChange {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+html, body {
     width: 100%;
     height: 100%;
-    font-size: 0;
     -webkit-user-select: none;
     user-select: none;
-    transition: all 1s;
+    transition: background-color 1s;
 }
 
 body {
@@ -15,6 +40,10 @@ body {
 }
 
 * {
+    margin: 0;
+    padding: 0;
+    font-size: 0;
+    line-height: 2em;
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 }
 
@@ -27,16 +56,9 @@ body {
     border-radius: 0.25vw;
 }
 
-@font-face{
-    font-family: 'btnFont';
-    src : url('../font/btnFont.woff2');
-}
-
 header {
     position: fixed;
     display: flex;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 0;
     justify-content: center;
@@ -46,10 +68,10 @@ header {
 
 nav {
     display: flex;
-    width: 10vh;
+    width: 5em;
     height: 100%;
     font-size: 2vh;
-    text-align: center;
+    line-height: unset;
     justify-content: center;
     align-items: center;
     white-space: nowrap;
@@ -69,6 +91,7 @@ main {
     left: 10%;
     width: 80%;
     height: 80%;
+    border-radius: 1em;
     align-items: center;
     justify-content: center;
     transition: all 1s;
@@ -81,18 +104,20 @@ main {
 #taiChiDiagram {
     display: block;
     margin: auto;
+    width: 20em;
+    height: 20em;
     border-radius: 50%;
     box-shadow: 0px 0px 10px #000000;
     cursor: pointer;
-}
-
-#taiChiDiagram::after{
-    background:#FFFFFF;
-    border-color: #000000;
+    transition: all 1s;
 }
 
 #loading .text {
-    width: fit-content;
+    margin: 1em auto 0 auto;
+    height: 1.5em;
+    font-size: 3em;
+    line-height: 1.5em;
+    line-height: normal;
     transition: all 1s;
 }
 
@@ -100,47 +125,75 @@ main {
     display: none;
     width: 90%;
     height: 90%;
-    overflow: auto;
+    overflow-y: auto;
 }
 
 #homeText {
+    font-size: 2.5rem;
     text-align: center;
     transition: all 2s;
 }
 
-#container div {
-    width: 100%;
+#container div, #container a {
+    font-size: 1.25rem;
+}
+
+#container .font-size {
+    font-size: calc(var(--font-size) * 1rem);
+}
+
+.friendlyLink {
+    margin-bottom: 0.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+}
+
+.friendlyLink img {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    transform: rotate(0deg);
+}
+
+.friendlyLink:hover img {
+    transform: rotate(360deg);
+}
+
+.friendlyLink div {
+    margin-left: 0.5rem;
+    line-height: 2.75rem;
+}
+
+#container .friendlyLink:hover div {
+    font-size: 1.375rem;
 }
 
 #container > div:last-child .friendlyLink {
     margin-bottom: 0;
 }
 
-.friendlyLink img {
-    transform: rotate(0deg);
-}
-
-.friendlyLink:hover img {
-    transform: rotate(360deg);
-}
-
-.friendlyLink img {
-    transform: rotate(0deg);
-}
-
-.friendlyLink:hover img {
-    transform: rotate(360deg);
+.colorStyle {
+    display: inline-block;
+    margin-left: 1rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 5px #000000, 0 0 5px #FFFFFF;
 }
 
 #musicBtn, #lightBtn {
     position: fixed;
+    display: flex;
     z-index: 2;
     bottom: 1vh;
     width: 5vh;
     height: 5vh;
     font-size: 2.5vh;
-    line-height: 5vh;
-    text-align: center;
+    line-height: normal;
+    justify-content: center;
+    align-items: center;
     border-radius: 50%;
     font-family: 'btnFont';
     transition: all 1s;
@@ -154,17 +207,6 @@ main {
 #lightBtn {
     right: 1vh;
     cursor: pointer;
-}
-
-.colorStyle {
-    display: inline-block;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 0 5px #000000, 0 0 5px #FFFFFF;
-}
-
-#container div .colorStyle:first-child {
-    margin-left: 0;
 }
 
 .menu {
@@ -208,17 +250,18 @@ main {
     padding-right: 5vh;
 }
 
-#linkMenu {
+#pageMenu {
     position: fixed;
     z-index: 1;
+    padding: 1vh 0;
     width: 0;
     height: 0;
-    border-radius: 2.5vh;
+    border-radius: 1vh;
     overflow: hidden;
     transition: all 1s;
 }
 
-#linkMenu .btn {
+#pageMenu .btn {
     padding: 0 2vh;
     width: 10vh;
     font-size: 1.8vh;
@@ -238,142 +281,30 @@ main {
     height: 100%;
 }
 
+#animationCanvas {
+    position: fixed;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
 @media screen and (min-aspect-ratio: 1 / 1) {
-    main {
-        border-radius: 1vh;
+    html {
+        font-size: 1vw;
     }
 
-    #taiChiDiagram {
-        width: 20vh;
-        height: 20vh;
-    }
-
-    #loading .text {
-        margin: 3vh auto 0 auto;
-        height: 6vh;
-        font-size: 3vh;
-    }
-
-    #homeText {
-        font-size: 2.5vw;
-    }
-
-    #container div {
-        font-size: 1.25vw;
-        line-height: 2.5vw;
-    }
-
-    .friendlyLink {
-        margin-bottom: 0.5vw;
-        width: 2.75vw;
-        height: 2.75vw;
-    }
-    
-    .friendlyLink img {
-        width: 2.75vw;
-        height: 2.75vw;
-    }
-
-    .friendlyLink div {
-        margin-left: 0.5vw;
-    }
-
-    #container .friendlyLink:hover div {
-        font-size: 1.375vw;
-        line-height: 2.75vw;
-    }
-
-    #container .font-size {
-        font-size: calc(var(--font-size) * 1vw);
-        line-height: calc(var(--font-size) * 2vw);
-    }
-
-    #container div .colorStyle {
-        margin-left: 1vw;
-        width: 2.75vw;
-        height: 2.75vw;
+    main, #loading , #taiChiDiagram {
+        font-size: 1vh;
     }
 }
 
 @media screen and (max-aspect-ratio: 1 / 1) {
-    main {
-        border-radius: 1vw;
-    }
-    
-    #taiChiDiagram {
-        width: 20vw;
-        height: 20vw;
+    html {
+        font-size: 1vh;
     }
 
-    #loading .text {
-        margin: 3vw auto 0 auto;
-        height: 6vw;
-        font-size: 3vw;
-    }
-
-    #homeText {
-        font-size: 2.5vh;
-    }
-
-    #container div {
-        font-size: 1.25vh;
-        line-height: 2.5vh;
-    }
-
-    .friendlyLink {
-        margin-bottom: 0.5vh;
-        width: 2.75vh;
-        height: 2.75vh;
-    }
-
-    .friendlyLink img {
-        width: 2.75vh;
-        height: 2.75vh;
-    }
-
-    .friendlyLink div {
-        margin-left: 0.5vh;
-    }
-
-    #container .friendlyLink:hover div {
-        font-size: 1.375vh;
-        line-height: 2.75vh;
-    }
-
-    #container .font-size {
-        font-size: calc(var(--font-size) * 1vh);
-        line-height: calc(var(--font-size) * 2vh);
-    }
-
-    #container div .colorStyle {
-        margin-left: 1vh;
-        width: 2.75vh;
-        height: 2.75vh;
-    }
-}
-
-
-
-@keyframes taiChiDiagramRotate {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes opacityChange {
-    0% {
-        opacity: 0;
-    }
-
-    50% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
+    main, #loading , #taiChiDiagram {
+        font-size: 1vw;
     }
 }

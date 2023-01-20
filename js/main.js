@@ -3,13 +3,11 @@
     let otherLight = 'blue';
     let clicked = false;
     let loaded = false;
-    let x;
-    let endX;
     let indexText;
     const page = {
         colorStyle: 'colorStyle'
     };
-    let pageNow = 0;
+    const html = $('html');
     const loading = $('#loading');
     const taiChiDiagram = $('#taiChiDiagram');
     const loadingText = $('.text');
@@ -22,6 +20,48 @@
     const musicBtn = $('#musicBtn');
     const lightBtn = $('#lightBtn');
     const mask = $('#mask');
+    const animationCanvas = $('#animationCanvas');
+
+
+    // 绑定移动进入配色设置页面功能
+    bindMoveFunction(html, {
+        default: () => {
+            html.setAttribute('data-startX', 'null');
+            html.setAttribute('data-endX', 'null');
+        },
+        start: (e) => {
+            if (e.clientX != null) {
+                html.setAttribute('data-startX', e.clientX);
+            } else {
+                html.setAttribute('data-startX', e.touches[0].clientX);
+            }
+        },
+        move: (e) => {
+            if (html.getAttribute('data-startX') != 'null') {
+                if (e.clientX != null) {
+                    html.setAttribute('data-endX', e.clientX);
+                } else {
+                    html.setAttribute('data-endX', e.touches[0].clientX);
+                }
+            }
+        },
+        end: () => {
+            const x = html.getAttribute('data-startX');
+            const endX = html.getAttribute('data-endX');
+            if (endX != 'null' && +x - +endX > window.innerWidth * 0.2) {
+                lightPageShow();
+                html.setAttribute('data-clicktimes', 0);
+            }
+            html.setAttribute('data-startX', 'null');
+            html.setAttribute('data-endX', 'null');
+        }
+    });
+    // 双击全屏功能
+    bindFullscreen(html);
+    animationCanvas.width = window.innerWidth;
+    animationCanvas.height = window.innerHeight;
+    // 绑定背景下雨动画
+    const rainAnimation = bindRainAnimation(animationCanvas, 100);
 
     
     const getClosestKeyWord = (keyWords, text) => {
@@ -321,21 +361,23 @@
     };
 
 
-    const pageShow = (text, pageIndex) => {
-        if (pageIndex == pageNow) {
-            container.innerHTML = '';
-            text = text.split('\r\n');
-            for (const i in text) {
-                setElement(text[i]);
-            }
-        }
-    };
-
-
     const setPage = (name) => {
+        if ($('#homeText')) {
+            main.removeChild(homeText);
+            container.style.display = 'block';
+        }
         container.innerHTML = '';
         container.style.display = 'block';
-        ajax.get('txt/page/' + page[name] + '.txt', pageShow, pageNow);
+        nowNavSet();
+        ajax.get('txt/page/' + page[name] + '.txt', (text, pageNow) => {
+            if (pageNow == html.getAttribute('data-pageNow')) {
+                container.innerHTML = '';
+                text = text.split('\r\n');
+                for (const i in text) {
+                    setElement(text[i]);
+                }
+            }
+        }, html.getAttribute('data-pageNow'));
     };
 
 
@@ -347,13 +389,9 @@
             const nav = document.createElement('nav');
             nav.innerHTML = name;
             nav.addEventListener('click', () => {
-                if (+i != pageNow) {
-                    if (pageNow >= 0) {
-                        $('nav', pageNow).classList.remove('now');
-                    }
-                    nav.classList.add('now');
-                    homeText.style.display = 'none';
-                    pageNow = +i;
+                const pageNow = html.getAttribute('data-pageNow');
+                if (i != pageNow) {
+                    html.setAttribute('data-pageNow', i);
                     setPage(name);
                 }
             });
@@ -363,17 +401,15 @@
     };
 
 
-    const loadingAnimation = () => {
-        const text = '网页正在加载...';
-        const nowText = loadingText.innerHTML;
-        setTimeout(() => {
-            if (nowText != text) {
-                loadingText.innerHTML = nowText + text[nowText.length];
-            } else {
-                loadingText.innerHTML = '';
-            }
-            loadingAnimation();
-        }, 200);
+    const nowNavSet = () => {
+        const pageNow = html.getAttribute('data-pageNow');
+        const lastNav = header.querySelector('.now');
+        if (lastNav) {
+            lastNav.classList.remove('now');
+        }
+        if (pageNow >= 0) {
+            $('nav', pageNow).classList.add('now');
+        }
     };
 
 
@@ -383,28 +419,16 @@
             top: '17.5%',
             height: '75%'
         });
-        const timer = setInterval(() => {
-            const need = parseInt(window.innerHeight * 0.1);
-            const now = parseInt(header.offsetHeight);
-            if (now >= need) {
-                header.classList.add('show');
-                if (pageNow >= 0) {
-                    $('nav', pageNow).classList.add('now');
+        bindEqualValues(() => parseInt(header.offsetHeight) >= parseInt(window.innerHeight * 0.1), true, () => {
+            header.classList.add('show');
+            nowNavSet();
+            homeText.style.opacity = 0;
+            bindEqualValues(() => +getComputedStyle(homeText).opacity, 0, () => {
+                if ($('#homeText')) {
+                    setPage($('nav', html.getAttribute('data-pageNow')).innerHTML);
                 }
-                homeText.style.opacity = 0;
-                let homeTextTimer = setInterval(() => {
-                    if (getComputedStyle(homeText).opacity == 0) {
-                        if (getComputedStyle(homeText).display != 'none') {
-                            homeText.style.display = 'none';
-                            container.style.display =' block';
-                            setPage($('nav', pageNow).innerHTML);
-                        }
-                        clearInterval(homeTextTimer);
-                    }
-                }, 10);
-                clearInterval(timer);
-            }
-        }, 10);
+            });
+        });
     };
 
 
@@ -415,38 +439,24 @@
             opacity: 1
         });
         $('.menu').style.display = 'block';
-        const timer = setInterval(() => {
-            if (getComputedStyle(musicBtn).opacity == 1) {
-                musicBtn.addEventListener('click', () => {
-                    if (music.paused) {
-                        music.play();
-                    } else {
-                        music.pause();
-                    }
-                });
-                musicBtn.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
+        bindEqualValues(() => getComputedStyle(musicBtn).opacity, 1, () => {
+            musicBtn.addEventListener('click', () => {
+                if (music.paused) {
+                    music.play();
+                } else {
+                    music.pause();
+                }
+            });
+
+            // 绑定音乐播放控制按钮菜单
+            bindMenu(musicBtn, {
+                show() {
                     menuShow(0);
-                });
-                music.play();
-                clearInterval(timer);
-            }
-        }, 10);
-    };
-
-
-    const homeTextAnimation = () => {
-        const text = setElement(indexText, true).toUpperCase();
-        const nowText = homeText.innerHTML;
-        if (nowText != text) {
-            setTimeout(() => {
-                homeText.innerHTML = nowText + text[nowText.length];
-                homeTextAnimation(text);
-            }, 100);
-        } else {
-            headerShow();
-            musicBtnShow();
-        }
+                }
+            });
+            // 播放背景音乐
+            music.play();
+        });
     };
 
 
@@ -454,13 +464,17 @@
         if (loaded) {
             setTimeout(() => {
                 loading.style.opacity = 0;
-                const timer = setInterval(() => {
-                    if (getComputedStyle(loading).opacity == 0) {
-                        loading.style.display = 'none';
-                        homeTextAnimation();
-                        clearInterval(timer);
-                    }
-                }, 10);
+                bindEqualValues(() => getComputedStyle(loading).opacity, 0, () => {
+                    main.removeChild(loading);
+                    bindTextAnimation(homeText, setElement(indexText, true).toUpperCase(), 100, () => {
+                        if (homeText.innerHTML == setElement(indexText, true).toUpperCase()) {
+                            headerShow();
+                            musicBtnShow();
+                            return true;
+                        }
+                        return false;
+                    });
+                });
             }, 2000);
         }
     };
@@ -469,6 +483,9 @@
     const setLight = (needLight) => {
         document.body.classList.remove(light);
         light = needLight;
+        document.body.classList.add(light);
+        setCookie('light', light);
+        rainAnimation.getColor();
         if (light == 'dark') {
             lightBtn.innerHTML = '&#xe7c5;';
         } else if (light == 'white') {
@@ -488,21 +505,14 @@
                 }
             }
         }
-        document.body.classList.add(light);
-        setCookie('light', light);
     };
 
     
-    const showSetLightPage = () => {
+    const lightPageShow = () => {
+        const pageNow = html.getAttribute('data-pageNow');
         if (pageNow != -2) {
-            if (homeText.innerHTML == setElement(indexText, true).toUpperCase()) {
-                homeText.style.display = 'none';
-            }
-            if (getComputedStyle(homeText).display == 'none') {
-                if (pageNow >= 0) {
-                    $('nav', pageNow).classList.remove('now');
-                }
-                pageNow = -2;
+            if (($('#homeText') && homeText.innerHTML == setElement(indexText, true).toUpperCase()) || !$('#homeText')) {
+                html.setAttribute('data-pageNow', -2);
                 setPage('colorStyle');
             }
         }
@@ -534,7 +544,17 @@
                 });
             } else if (btn[i].innerHTML == '配色设置页') {
                 btn[i].addEventListener('click', () => {
-                    showSetLightPage();
+                    lightPageShow();
+                });
+            } else if (btn[i].innerHTML == '关闭动画') {
+                btn[i].addEventListener('click', () => {
+                    if (btn[i].innerHTML == '关闭动画') {
+                        rainAnimation.stop();
+                        btn[i].innerHTML = '开启动画';
+                    } else {
+                        rainAnimation.start();
+                        btn[i].innerHTML = '关闭动画';
+                    }
                 });
             } else if (btn[i].getAttribute('data-href')) {
                 btn[i].addEventListener('click', () => {
@@ -559,7 +579,7 @@
             musicBtn.style.background = 'none';
         }
         mask.style.display = 'block';
-        linkMenuHide();
+        pageMenuHide();
     };
 
 
@@ -578,27 +598,25 @@
     };
 
 
-    const linkMenuHide = () => {
-        Object.assign($('#linkMenu').style, {
+    const pageMenuHide = () => {
+        Object.assign($('#pageMenu').style, {
             width: '',
             height: '',
             boxShadow: ''
         });
-        const timer = setInterval(() => {
-            if (getComputedStyle($('#linkMenu')).width.replace('px', '') == 0) {
-                Object.assign($('#linkMenu').style, {
-                    top: '',
-                    left: ''
-                });
-                clearInterval(timer);
-            }
-        }, 10);
+        bindEqualValues(() => getComputedStyle($('#pageMenu')).width.replace('px', ''), 0, () => {
+            Object.assign($('#pageMenu').style, {
+                top: '',
+                left: ''
+            });
+        });
     };
 
 
     {
         drawTaiChiDiagram();
         setBtnFunction();
+        html.setAttribute('data-pageNow', 0);
         if (getCookie('light')) {
             light = getCookie('light');
         }
@@ -617,19 +635,16 @@
                 clicked = true;
                 taiChiDiagram.style.cursor = 'auto';
                 loadingText.style.opacity = 0;
-                const timer = setInterval(() => {
-                    if (getComputedStyle(loadingText).opacity == 0) {
-                        taiChiDiagram.style.animation = 'taiChiDiagramRotate linear 2s infinite';
-                        Object.assign(loadingText.style, {
-                            transition: '',
-                            opacity: 1
-                        });
-                        loadingText.innerHTML = '';
-                        loadingAnimation();
-                        loadEvent();
-                        clearInterval(timer);
-                    }
-                }, 10);
+                bindEqualValues(() => getComputedStyle(loadingText).opacity, 0, () => {
+                    taiChiDiagram.style.animation = 'taiChiDiagramRotate linear 2s infinite';
+                    Object.assign(loadingText.style, {
+                        transition: '',
+                        opacity: 1
+                    });
+                    loadingText.innerHTML = '';
+                    bindTextAnimation(loadingText, '网页正在加载...', 200, () => !$('#loading'));
+                    loadEvent();
+                });
             }
         });
     };
@@ -655,7 +670,7 @@
 
     musicBtn.onclick = () => {
         menuHide();
-        linkMenuHide();
+        pageMenuHide();
         mask.style.display = 'none';
     };
 
@@ -670,69 +685,80 @@
         }
     });
 
-
-    lightBtn.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        menuShow(1);
+    
+    // 绑定配色切换按钮菜单
+    bindMenu(lightBtn, {
+        show() {
+            menuShow(1);
+        }
     });
+
+    
 
 
     mask.addEventListener('click', () => {
         menuHide();
-        linkMenuHide();
+        pageMenuHide();
         mask.style.display = 'none';
     });
 
 
-    window.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        if ((e.target != musicBtn || getComputedStyle(musicBtn).opacity == 0) && e.target != lightBtn && !e.target.classList.contains('btn')) {
-            const linkMenu = $('#linkMenu');
-            let x;
-            let y;
-            if (e.clientX < 5) {
-                x = 5;
-            } else if (e.clientX + window.innerHeight * 0.14 < window.innerWidth - 5) {
-                x = e.clientX;
-            } else {
-                x = e.clientX - window.innerHeight * 0.14 - 5;
-            }
-            if (e.clientY < 5) {
-                y = 5;
-            } else if (e.clientY + window.innerHeight * 0.05 < window.innerHeight - 5) {
-                y = e.clientY;
-            } else {
-                y = e.clientY - window.innerHeight * 0.05 - 5;
-            }
-            if (getComputedStyle(musicBtn).opacity != 0) {
-                if (e.clientY > musicBtn.offsetTop && e.clientX < musicBtn.offsetLeft + musicBtn.offsetWidth + 5) {
-                    x = musicBtn.offsetLeft + musicBtn.offsetWidth + 5;
+    // 绑定页面菜单
+    bindMenu(window, {
+        show(e) {
+            if ((e.target != musicBtn || getComputedStyle(musicBtn).opacity == 0) && e.target != lightBtn && !e.target.classList.contains('btn')) {
+                const pageMenu = $('#pageMenu');
+                let x;
+                let y;
+                const width = window.innerHeight * 0.14;
+                const height = window.innerHeight * 0.12;
+                if (e.touches) {
+                    x = e.touches[0].clientX;
+                    y = e.touches[0].clientY;
+                } else {
+                    x = e.clientX;
+                    y = e.clientY;
                 }
-                if (e.clientX < musicBtn.offsetLeft + musicBtn.offsetWidth && e.clientY + window.innerHeight * 0.05 > musicBtn.offsetTop) {
-                    y = musicBtn.offsetTop - window.innerHeight * 0.05 - 5;
+                if (x < 5) {
+                    x = 5;
+                } else if (x + width > window.innerWidth - 5) {
+                    x = x - width - 5;
                 }
+                if (y < 5) {
+                    y = 5;
+                } else if (y + height > window.innerHeight - 5) {
+                    y = y - height - 5;
+                }
+                if (getComputedStyle(musicBtn).opacity != 0) {
+                    if (y > musicBtn.offsetTop && x < musicBtn.offsetLeft + musicBtn.offsetWidth + 5) {
+                        x = musicBtn.offsetLeft + musicBtn.offsetWidth + 5;
+                    }
+                    if (x < musicBtn.offsetLeft + musicBtn.offsetWidth && y + height > musicBtn.offsetTop) {
+                        y = musicBtn.offsetTop - height - 5;
+                    }
+                }
+                if (y > lightBtn.offsetTop && x + width > lightBtn.offsetLeft) {
+                    x = lightBtn.offsetLeft - width - 5;
+                }
+                if (x > lightBtn.offsetLeft && y + height > lightBtn.offsetTop) {
+                    y = lightBtn.offsetTop - height - 5;
+                }
+                Object.assign(pageMenu.style, {
+                    top: y + 'px',
+                    left: x + 'px',
+                    width: '14vh',
+                    height: '10vh',
+                    boxShadow: '0 0 5px #000000'
+                });
+                menuHide();
+                mask.style.display = 'block';
             }
-            if (e.clientY > lightBtn.offsetTop && e.clientX + window.innerHeight * 0.14 > lightBtn.offsetLeft) {
-                x = lightBtn.offsetLeft - window.innerHeight * 0.14 - 5;
-            }
-            if (e.clientX > lightBtn.offsetLeft && e.clientY + window.innerHeight * 0.05 > lightBtn.offsetTop) {
-                y = lightBtn.offsetTop - window.innerHeight * 0.05 - 5;
-            }
-            Object.assign(linkMenu.style, {
-                top: y + 'px',
-                left: x + 'px',
-                width: '14vh',
-                height: '5vh',
-                boxShadow: '0 0 5px #000000'
-            });
-            menuHide();
-            mask.style.display = 'block';
         }
     });
 
 
     window.addEventListener('resize', () => {
-        linkMenuHide();
+        pageMenuHide();
         const menu = $('.menu', -1);
         for (let i = 0; i < menu.length; i++) {
             if (!menu[i].classList.contains('hide')) {
@@ -740,36 +766,8 @@
             }
         }
         mask.style.display = 'none';
-    });
-
-
-    window.addEventListener('mousedown', (e) => {
-        x = e.clientX;
-    });
-
-
-    window.addEventListener('mouseup', (e) => {
-        if (x - e.clientX > window.innerWidth * 0.2) {
-            showSetLightPage();
-        }
-    });
-
-
-    window.addEventListener('touchstart', (e) => {
-        x = e.touches[0].clientX;
-    });
-
-
-    window.addEventListener('touchmove', (e) => {
-        endX = e.touches[0].clientX;
-    });
-    
-
-    window.addEventListener('touchend', () => {
-        if (endX && x - endX > window.innerWidth * 0.2) {
-            showSetLightPage();
-        }
-        endX = null;
+        animationCanvas.width = window.innerWidth;
+        animationCanvas.height = window.innerHeight;
     });
 
 
@@ -779,8 +777,4 @@
             loadEvent();
         }
     });
-
-
-    // 双击全屏功能
-    bindFullscreen($('html'));
 }

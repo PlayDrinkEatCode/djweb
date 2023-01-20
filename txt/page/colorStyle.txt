@@ -1,2 +1,1 @@
-[page-y-center:]
-[center:][y-center:][color-style:dark:#333333:][color-style:white:#DDDDDD:][color-style:blue:#99CCFF:][color-style:pink:#FF99CC:]
+[page-y-center:][center:][y-center:][color-style:dark:#333333:][color-style:white:#DDDDDD:][color-style:blue:#99CCFF:][color-style:pink:#FF99CC:]

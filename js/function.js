@@ -27,6 +27,12 @@ const ajax = {
 };
 
 
+// 获取随机整数
+const getRandomInt = (start, end) => {
+    return Math.floor(Math.random() * (end - start + 1)) + start;
+}
+
+
 // 替换掉所有字符串
 const replaceAll = (text, fromStr, toStr = '') => {
     while (text.includes(fromStr)) {
@@ -62,28 +68,48 @@ const exitFullscreen = (element) => {
 
 // 绑定元素双击控制全屏功能
 const bindFullscreen = (element) => {
-    element.setAttribute('clickTimes', 0);
-    let times = 0;
+    element.setAttribute('data-clickTimes', 0);
     element.addEventListener('click', (e) => {
         if (getComputedStyle(e.target).cursor == 'pointer') {
-            return element.setAttribute('clickTimes', times = 0);
+            return element.setAttribute('data-clickTimes', 0);
         }
-        times = element.getAttribute('clickTimes');
-        element.setAttribute('clickTimes', ++times);
+        let times = element.getAttribute('data-clickTimes');
+        element.setAttribute('data-clickTimes', ++times);
         if (times == 2) {
             if (document.fullscreenElement) {
                 exitFullscreen(element);
             } else {
                 requestFullscreen(element);
             }
-            return element.setAttribute('clickTimes', times = 0);
+            return element.setAttribute('data-clickTimes', 0);
         }
         setTimeout(() => {
-            if (times) {
-                element.setAttribute('clickTimes', --times);
+            let times = element.getAttribute('data-clickTimes');
+            if (+times) {
+                element.setAttribute('data-clickTimes', --times);
             }
         }, 500);
     });
+};
+
+
+// 绑定移动功能
+const bindMoveFunction = (element, functions) => {
+    if (functions.default) {
+        functions.default();
+    }
+    if (functions.start) {
+        element.addEventListener('mousedown', functions.start);
+        element.addEventListener('touchstart', functions.start);
+    }
+    if (functions.move) {
+        element.addEventListener('mousemove', functions.move);
+        element.addEventListener('touchmove', functions.move);
+    }
+    if (functions.end) {
+        element.addEventListener('mouseup', functions.end);
+        element.addEventListener('touchend', functions.end);
+    }
 };
 
 
@@ -111,11 +137,6 @@ const getCookie = (name) => {
             return cookie[i].split('=')[1];
         }
     }
-};
-
-
-// 判断两个数值是否接近
-const isClose = (num1, num2) => {
 };
 
 
@@ -167,4 +188,204 @@ const drawTaiChiDiagram = () => {
     ctx.fill();
     ctx.stroke();
     ctx.closePath();
+};
+
+
+// 绑定文字动画
+const bindTextAnimation = (element, text, time, end) => {
+    const textAnimation = () => {
+        const nowText = element.innerHTML;
+        const timer = setTimeout(() => {
+            if (end && end()) {
+                return clearInterval(timer);
+            }
+            if (nowText != text) {
+                element.innerHTML = nowText + text[nowText.length];
+            } else {
+                element.innerHTML = '';
+            }
+            textAnimation();
+        }, time);
+    };
+    textAnimation();
+};
+
+
+// 绑定值相等事件
+const bindEqualValues = (value1, value2, event) => {
+    const timer = setInterval(() => {
+        const value = [];
+        if (typeof value1 == 'function') {
+            value[0] = value1();
+        } else {
+            value[0] = value1;
+        }
+        if (typeof value2 == 'function') {
+            value[1] = value2();
+        } else {
+            value[1] = value2;
+        }
+        if (value[0] == value[1]) {
+            event();
+            clearInterval(timer);
+        }
+    }, 10);
+};
+
+
+// 绑定菜单功能
+const bindMenu = (element, functions) => {
+    const state = {
+        valid: true,
+        x: 0,
+        y: 0,
+        target: null,
+        timer: 0
+    };
+    const show = (e) => {
+        if (state.valid) {
+            functions.show(e);
+            state.valid = false;
+        }
+    }
+    element.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        show(e);
+    });
+    element.addEventListener('touchstart', (e) => {
+        state.valid = true;
+        state.x = e.touches[0].clientX;
+        state.y = e.touches[0].clientY;
+        state.target = e.touches[0].target;
+        state.timer = setTimeout(() => {
+            show(e);
+        }, 500);
+    });
+    element.addEventListener('touchmove', (e) => {
+        if (e.target != state.target) {
+            state.valid = false;
+        }
+    });
+    element.addEventListener('touchend', (e) => {
+        clearTimeout(state.timer);
+        if (!state.valid) {
+            e.preventDefault();
+        }
+    });
+};
+
+
+// 绑定下雨动画
+const bindRainAnimation = (canvas, rainDensity) => {
+    let timer;
+    let needCreate;
+    const ctx = canvas.getContext('2d');
+    const rains = [];
+    const waters = [];
+    const color = {};
+    const getColor = () => {
+        const colorStyle = getComputedStyle($('body'));
+        color.red = +colorStyle.getPropertyValue('--rain-red');
+        color.green = +colorStyle.getPropertyValue('--rain-green');
+        color.blue = +colorStyle.getPropertyValue('--rain-blue');
+    };
+    const createWater = (rain) => {
+        const number = parseInt(rain.size / 5);
+        for (let i = 0; i < number; i++) {
+            waters.push({
+                x: getRandomInt(rain.x - 5, rain.x + 5),
+                y: getRandomInt(window.innerHeight - 5, window.innerHeight),
+                opacity: rain.opacity,
+                xSpeed: getRandomInt(-2, 2),
+                ySpeed: -3
+            });
+        }
+    };
+    const drawWater = (water) => {
+        if (water.y > window.innerHeight) {
+            waters.splice(waters.indexOf(water), 1);
+            return;
+        }
+        water.x += water.xSpeed;
+        water.y += water.ySpeed;
+        water.ySpeed++;
+        ctx.beginPath();
+        ctx.arc(water.x, water.y, 0.5, 0, 2 * Math.PI);
+        ctx.strokeStyle = `rgba(${color.red}, ${color.green}, ${color.blue}, ${water.opacity})`;
+        ctx.fillStyle = `rgba(${color.red}, ${color.green}, ${color.blue}, ${water.opacity})`;
+        ctx.stroke();
+        ctx.fill();
+        ctx.closePath();
+    };
+    const createRain = (number) => {
+        for (let i = 0; i < number; i++) {
+            rains.push({
+                water: true,
+                x: getRandomInt(0, window.innerWidth),
+                y: getRandomInt(-window.innerHeight, -30),
+                size: getRandomInt(15, 30),
+                opacity: (() => {
+                    let opacity = Math.random();
+                    if (opacity < 0.3) {
+                        opacity += 0.3;
+                    }
+                    return opacity.toFixed(1);
+                })() ,
+                speed: 5
+            });
+        }
+    };
+    const drawRain = (rain) => {
+        if (rain.y >= window.innerHeight) {
+            rains.splice(rains.indexOf(rain), 1);
+            if (needCreate) {
+                createRain(1);
+            }
+            return;
+        }
+        rain.y += rain.speed;
+        if (rain.y >= 0 && rain.speed < 10) {
+            rain.speed++;
+        }
+        if (rain.water && rain.y + rain.size >= window.innerHeight) {
+            createWater(rain);
+            rain.water = false;
+        }
+        ctx.beginPath();
+        ctx.moveTo(rain.x, rain.y);
+        ctx.lineTo(rain.x, rain.y + rain.size);
+        ctx.strokeStyle = `rgba(${color.red}, ${color.green}, ${color.blue}, ${rain.opacity})`;
+        ctx.stroke();
+        ctx.closePath();
+    };
+    const draw = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const i in rains) {
+            drawRain(rains[i]);
+        }
+        for (const i in waters) {
+            drawWater(waters[i]);
+        }
+        if (!rains.length && !waters.length) {
+            clearInterval(timer);
+            timer = null;
+        }
+    };
+    const start = () => {
+        getColor();
+        needCreate = true;
+        if (!timer) {
+            timer = setInterval(() => draw(), 10);
+        }
+        createRain(rainDensity - rains.length);
+    };
+    start();
+    return {
+        stop() {
+            needCreate = false;
+            draw();
+        },
+        start,
+        getColor
+    };
 };

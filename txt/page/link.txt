@@ -1,5 +1,4 @@
-[page-y-center:]
-[light:dark:][link:https://github.com/zdjweb:][friendly-link:][icon:image/icon/github-mark-white.svg:][link-text:]Github zdjweb[:link-text][:friendly-link][:link][:light]
+[page-y-center:][light:dark:][link:https://github.com/zdjweb:][friendly-link:][icon:image/icon/github-mark-white.svg:][link-text:]Github zdjweb[:link-text][:friendly-link][:link][:light]
 [light:white:][link:https://github.com/zdjweb:][friendly-link:][icon:image/icon/github-mark.svg:][link-text:]Github zdjweb[:link-text][:friendly-link][:link][:light]
 [light:blue:][link:https://github.com/zdjweb:][friendly-link:][icon:image/icon/github-mark.svg:][link-text:]Github zdjweb[:link-text][:friendly-link][:link][:light]
 [light:pink:][link:https://github.com/zdjweb:][friendly-link:][icon:image/icon/github-mark.svg:][link-text:]Github zdjweb[:link-text][:friendly-link][:link][:light]
